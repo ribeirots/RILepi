@@ -56,21 +56,19 @@ java -Xmx5g -Djava.io.tmpdir=./tmp -jar ./alignment_software/GenomeAnalysisTK-3.
 
 java -Xmx5g -jar ./alignment_software/picard-tools-1.79/picard-tools-1.79/BuildBamIndex.jar INPUT=${1}_realign.bam
 
-java -Xmx5g -jar ./alignment_software/GenomeAnalysisTK-3.2-2/GenomeAnalysisTK.jar -T UnifiedGenotyper -R ./alignment_software/dmel_ref/DmelRef.fasta -mbq 10 -stand_call_conf 31 -stand_emit_conf 31 -ploidy 2 -out_mode EMIT_ALL_SITES -I ${1}_realign.bam -o ${1}_shifted.vcf # this is the sites vcf, changing name to shifted to run on the next script
-
-gzip ${1}_shifted.vcf
-
-perl VCF_to_Seq_diploid_ambiguities.pl
-
-gzip -d ${1}_shifted.vcf
-
-mv ${1}_shifted.vcf ${1}_sites.vcf
+java -Xmx5g -jar ./alignment_software/GenomeAnalysisTK-3.2-2/GenomeAnalysisTK.jar -T UnifiedGenotyper -R ./alignment_software/dmel_ref/DmelRef.fasta -mbq 10 -stand_call_conf 31 -stand_emit_conf 31 -ploidy 2 -out_mode EMIT_ALL_SITES -I ${1}_realign.bam -o ${1}_sites.vcf 
 
 gzip ${1}_sites.vcf
 
+tabix -p vcf ${1}_sites.vcf.gz
+perl VCF_to_Seq_diploid_ambiguities.pl
+
+bcftools consensus -I -f ./alignment_software/dmel_ref/DmelRef.fasta ${1}_sites.vcf.gz > ${1}_sites.fasta # this fasta file will not be separated by chrm arm, will need further processing
+
+
 mv ${1}_realign.bam output/
 mv *.fas output/
-mv ${1}_sites.vcf.gz output/
+mv ${1}_sites.vcf.g* output/
 mv ${1}_INDELS.vcf output/
 mv ${1}_SNPs.vcf output/
 mv *.log output/
