@@ -3,6 +3,18 @@
 # FILEID is the input argument that the script takes
 # final output contains several vcf files and fasta files per chromosome arm for Dmel (X, 2L, 2R, 3L, and 3R)
 
+# It requires picard and GATK, specific versions can be seen in the commands below.
+# It requires Dmel reference fasta
+# It requires Pool Lab script VCF_to_Seq_diploid_ambiguities.pl
+
+# Check if perl script exists.
+if [ ! -f VCF_to_Seq_diploid_ambiguities.pl ]
+then
+	echo "VCF_to_Seq_diploid_ambiguities.pl script not found in this folder."
+	echo "Terminating script."
+	exit 1
+fi
+
 # creates output/ directory if one does not already exists.
 # if output/ directory already exists, ask whether to continue after warning about potential files being overwritten.
 if [ ! -d output/ ]
