@@ -1,7 +1,8 @@
 #!/bin/bash
+# Script for the parental genomes.
 # Script starting with bam files with duplicated removed. The file has to be labeled FILEID_rmdup.bam
 # FILEID is the input argument that the script takes
-# final output contains several vcf files and fasta files per chromosome arm for Dmel (X, 2L, 2R, 3L, and 3R)
+# The final output contains several vcf files and fasta files per chromosome arm for Dmel (X, 2L, 2R, 3L, and 3R)
 
 # It requires picard and GATK, specific versions can be seen in the commands below.
 # It requires Dmel reference fasta
@@ -13,6 +14,12 @@ then
 	echo "VCF_to_Seq_diploid_ambiguities.pl script not found in this folder."
 	echo "Terminating script."
 	exit 1
+fi
+
+# creates tmp/ directory if one does not already exists.
+if [ ! -d tmp/ ]
+then
+	mkdir tmp
 fi
 
 # creates output/ directory if one does not already exists.
