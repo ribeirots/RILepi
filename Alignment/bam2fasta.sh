@@ -7,6 +7,7 @@
 # It requires picard and GATK, specific versions can be seen in the commands below.
 # It requires Dmel reference fasta
 # It requires Pool Lab script VCF_to_Seq_diploid_ambiguities.pl
+# It requires indel_bed.py script (made by me)
 
 # Check if perl script exists.
 if [ ! -f VCF_to_Seq_diploid_ambiguities.pl ]
@@ -54,25 +55,27 @@ java -Xmx5g -Djava.io.tmpdir=./tmp -jar ./alignment_software/GenomeAnalysisTK-3.
 
 java -Xmx5g -Djava.io.tmpdir=./tmp -jar ./alignment_software/GenomeAnalysisTK-3.2-2/GenomeAnalysisTK.jar -T UnifiedGenotyper -R ./alignment_software/dmel_ref/DmelRef.fasta -mbq 10 -stand_call_conf 31 -stand_emit_conf 31 -ploidy 2 -minIndelFrac 0.51 -minIndelCnt 3 -glm INDEL -I ${1}_realign.bam -o ${1}_INDELS.vcf
 
+python3 indel_bed.py ${1}_INDELS.vcf
+
 java -Xmx5g -jar ./alignment_software/picard-tools-1.79/picard-tools-1.79/BuildBamIndex.jar INPUT=${1}_realign.bam
 
 java -Xmx5g -jar ./alignment_software/GenomeAnalysisTK-3.2-2/GenomeAnalysisTK.jar -T UnifiedGenotyper -R ./alignment_software/dmel_ref/DmelRef.fasta -mbq 10 -stand_call_conf 31 -stand_emit_conf 31 -ploidy 2 -out_mode EMIT_ALL_SITES -I ${1}_realign.bam -o ${1}_sites.vcf 
 
-#bgzip ${1}_sites.vcf
+bgzip ${1}_sites.vcf
 
-#tabix -p vcf ${1}_sites.vcf.gz
+tabix -p vcf ${1}_sites.vcf.gz
 
-#bcftools consensus -I -f ./alignment_software/dmel_ref/DmelRef.fasta ${1}_sites.vcf.gz > ${1}_sites.fasta # this fasta file will not be separated by chrm arm, will need further processing
+bcftools consensus -I -f ./alignment_software/dmel_ref/DmelRef.fasta ${1}_sites.vcf.gz > ${1}_sites.fasta # this fasta file will not be separated by chrm arm, will need further processing
 
-grep -v '#' ${1}_sites.vcf > ${1}_shifted.vcf # this is only called shifted because that is the name format used on the perl script below (previously used in the NEXUS pipeline)
-gzip ${1}_shifted.vcf
-gzip ${1}_sites.vcf
+#grep -v '#' ${1}_sites.vcf > ${1}_shifted.vcf # this is only called shifted because that is the name format used on the perl script below (previously used in the NEXUS pipeline)
+#gzip ${1}_shifted.vcf
+#gzip ${1}_sites.vcf
 mv ${1}_sites.vcf.g* output/
-perl VCF_to_Seq_diploid_ambiguities.pl
+#perl VCF_to_Seq_diploid_ambiguities.pl
 
 mv ${1}_realign.bam output/
 mv *.fas output/
 mv ${1}_INDELS.vcf output/
 mv ${1}_SNPs.vcf output/
 mv *.log output/
-mv ${1}_shifted.vcf.g* output/
+#mv ${1}_shifted.vcf.g* output/
