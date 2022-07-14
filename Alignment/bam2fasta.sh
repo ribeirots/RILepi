@@ -8,11 +8,27 @@
 # It requires Dmel reference fasta
 # It requires Pool Lab script VCF_to_Seq_diploid_ambiguities.pl
 # It requires indel_bed.py script (made by me)
+# It requires filter_indel_vcf.py script (made by me)
 
-# Check if perl script exists.
+
+# Check if custom made script exists.
 if [ ! -f VCF_to_Seq_diploid_ambiguities.pl ]
 then
 	echo "VCF_to_Seq_diploid_ambiguities.pl script not found in this folder."
+	echo "Terminating script."
+	exit 1
+fi
+
+if [ ! -f indel_bed.py ]
+then
+	echo "indel_bed.py script not found in this folder."
+	echo "Terminating script."
+	exit 1
+fi
+
+if [ ! -f filter_indel_vcf.py ]
+then
+	echo "filter_indel_vcf.py script not found in this folder."
 	echo "Terminating script."
 	exit 1
 fi
@@ -24,20 +40,9 @@ then
 fi
 
 # creates output/ directory if one does not already exists.
-# if output/ directory already exists, ask whether to continue after warning about potential files being overwritten.
 if [ ! -d output/ ]
 then
 	mkdir output
-else
-	echo "output directory already exists.\n"
-	echo "Be aware that files might be overwritten in output/."
-	echo "OK to continue? [yes/no]"
-	read $var1
-	if [ ! $var1 = 'yes' ]
-	then
-		echo "Terminating script. Check the output directory."
-		exit 1
-	fi
 fi
 
 java -Xmx5g -Djava.io.tmpdir=./tmp -jar ./alignment_software/picard-tools-1.79/picard-tools-1.79/AddOrReplaceReadGroups.jar RGLB=Lane1 RGPL=Illumina RGPU=TTAGGC RGSM=$1 INPUT=${1}_rmdup.bam OUTPUT=${1}_header.bam
@@ -61,21 +66,24 @@ java -Xmx5g -jar ./alignment_software/picard-tools-1.79/picard-tools-1.79/BuildB
 
 java -Xmx5g -jar ./alignment_software/GenomeAnalysisTK-3.2-2/GenomeAnalysisTK.jar -T UnifiedGenotyper -R ./alignment_software/dmel_ref/DmelRef.fasta -mbq 10 -stand_call_conf 31 -stand_emit_conf 31 -ploidy 2 -out_mode EMIT_ALL_SITES -I ${1}_realign.bam -o ${1}_sites.vcf 
 
+python3 filter_indel_vcf.py ${1}_INDELS_indels.bed ${1}_sites.vcf
+
+
 bgzip ${1}_sites.vcf
 
 tabix -p vcf ${1}_sites.vcf.gz
 
-bcftools consensus -I -f ./alignment_software/dmel_ref/DmelRef.fasta ${1}_sites.vcf.gz > ${1}_sites.fasta # this fasta file will not be separated by chrm arm, will need further processing
+bcftools consensus -H I -a N -f -f ./alignment_software/dmel_ref/DmelRef.fasta ${1}_sites_indelfree.vcf.gz > ${1}_sites.fasta # this fasta file will not be separated by chrm arm, will need further processing. The VCF was filtered from indels and low quality sites. -H I will output IUPAC code from the genotypes and -a N will output N when the site is absent.
 
 #grep -v '#' ${1}_sites.vcf > ${1}_shifted.vcf # this is only called shifted because that is the name format used on the perl script below (previously used in the NEXUS pipeline)
 #gzip ${1}_shifted.vcf
 #gzip ${1}_sites.vcf
-mv ${1}_sites.vcf.g* output/
+mv ${1}_site*.vcf.g* output/
 #perl VCF_to_Seq_diploid_ambiguities.pl
 
-mv ${1}_realign.bam output/
+mv ${1}_realign.ba* output/
 mv *.fas output/
-mv ${1}_INDELS.vcf output/
-mv ${1}_SNPs.vcf output/
+mv ${1}_INDEL*.vc* output/
+mv ${1}_SNPs.vc* output/
 mv *.log output/
 #mv ${1}_shifted.vcf.g* output/
