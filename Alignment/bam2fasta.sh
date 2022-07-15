@@ -7,9 +7,7 @@
 # It requires picard and GATK, specific versions can be seen in the commands below.
 # It requires Dmel reference fasta
 # It requires Pool Lab script VCF_to_Seq_diploid_ambiguities.pl
-# It requires indel_bed.py script (made by me)
-# It requires filter_indel_vcf.py script (made by me)
-
+# It requires indel_vcf.py script (made by me)
 
 # Check if custom made script exists.
 if [ ! -f VCF_to_Seq_diploid_ambiguities.pl ]
@@ -19,16 +17,9 @@ then
 	exit 1
 fi
 
-if [ ! -f indel_bed.py ]
+if [ ! -f indel_vcf.py ]
 then
-	echo "indel_bed.py script not found in this folder."
-	echo "Terminating script."
-	exit 1
-fi
-
-if [ ! -f filter_indel_vcf.py ]
-then
-	echo "filter_indel_vcf.py script not found in this folder."
+	echo "indel_vcf.py script not found in this folder."
 	echo "Terminating script."
 	exit 1
 fi
@@ -66,14 +57,16 @@ java -Xmx5g -jar ./alignment_software/picard-tools-1.79/picard-tools-1.79/BuildB
 
 java -Xmx5g -jar ./alignment_software/GenomeAnalysisTK-3.2-2/GenomeAnalysisTK.jar -T UnifiedGenotyper -R ./alignment_software/dmel_ref/DmelRef.fasta -mbq 10 -stand_call_conf 31 -stand_emit_conf 31 -ploidy 2 -out_mode EMIT_ALL_SITES -I ${1}_realign.bam -o ${1}_sites.vcf 
 
-python3 filter_indel_vcf.py ${1}_INDELS_indels.bed ${1}_sites.vcf
+#python3 filter_indel_vcf.py ${1}_INDELS_indels.bed ${1}_sites.vcf
+python3 indel_vcf.py EF43N_INDELS.vcf # generates vcf file with all the sites to be filtered out for being indels or near indels (3 bp). The output is used in the bedtools intersect command below
 
+bedtools intersect -v -a ${1}_sites.vcf -b ${1}_INDELS_indelfilter.vcf > ${1}_noindel_sites.vcf  # -v outputs the sites in -a that do not overlap -b. It basically masks the indel regions
 
-bgzip ${1}_sites.vcf
+bgzip ${1}_noindel_sites.vcf
 
-tabix -p vcf ${1}_sites.vcf.gz
+tabix -p vcf ${1}_noindel_sites.vcf.gz
 
-bcftools consensus -H I -a N -f -f ./alignment_software/dmel_ref/DmelRef.fasta ${1}_sites_indelfree.vcf.gz > ${1}_sites.fasta # this fasta file will not be separated by chrm arm, will need further processing. The VCF was filtered from indels and low quality sites. -H I will output IUPAC code from the genotypes and -a N will output N when the site is absent.
+bcftools consensus -H I -a N -i 'QUAL>=32' -f ./alignment_software/dmel_ref/DmelRef.fasta ${1}_noindel_sites.vcf.gz > ${1}_sites.fasta # this fasta file will not be separated by chrm arm, will need further processing. The VCF was filtered from indels. This command should filter out low quality sites (-i should only include QUAL>=32). -H I will output IUPAC code from the genotypes and -a N will output N when the site is absent.
 
 #grep -v '#' ${1}_sites.vcf > ${1}_shifted.vcf # this is only called shifted because that is the name format used on the perl script below (previously used in the NEXUS pipeline)
 #gzip ${1}_shifted.vcf
