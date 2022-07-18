@@ -57,7 +57,6 @@ java -Xmx5g -jar ./alignment_software/picard-tools-1.79/picard-tools-1.79/BuildB
 
 java -Xmx5g -jar ./alignment_software/GenomeAnalysisTK-3.2-2/GenomeAnalysisTK.jar -T UnifiedGenotyper -R ./alignment_software/dmel_ref/DmelRef.fasta -mbq 10 -stand_call_conf 31 -stand_emit_conf 31 -ploidy 2 -out_mode EMIT_ALL_SITES -I ${1}_realign.bam -o ${1}_sites.vcf 
 
-#python3 filter_indel_vcf.py ${1}_INDELS_indels.bed ${1}_sites.vcf
 python3 indel_vcf.py ${1}_INDELS.vcf # generates vcf file with all the sites to be filtered out for being indels or near indels (3 bp). The output is used in the bedtools intersect command below
 
 bedtools intersect -v -a ${1}_sites.vcf -b ${1}_INDELS_indelfilter.vcf -header > ${1}_noindel_sites.vcf  # -v outputs the sites in -a that do not overlap -b. It basically masks the indel regions
@@ -72,11 +71,7 @@ bcftools consensus -I -m ${1}_to_exclude.vcf -f ./alignment_software/dmel_ref/Dm
 
 python3 split_fasta.py ${1}_sites.fasta ${1}
 
-#grep -v '#' ${1}_sites.vcf > ${1}_shifted.vcf # this is only called shifted because that is the name format used on the perl script below (previously used in the NEXUS pipeline)
-#gzip ${1}_shifted.vcf
-#gzip ${1}_sites.vcf
 mv ${1}*_site*.vcf.g* output/
-#perl VCF_to_Seq_diploid_ambiguities.pl
 
 mv ${1}_realign.ba* output/
 mv *.fas output/
@@ -86,4 +81,3 @@ mv *.log output/
 mv *.fasta output/
 rm ${1}_sites.fasta
 rm ${1}_to_exclude.vcf
-#mv ${1}_shifted.vcf.g* output/
