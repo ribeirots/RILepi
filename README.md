@@ -21,4 +21,4 @@ To generate the fasta files from the vcf files I am having to create a new pipel
 The RILs realign bamfiles and the fasta files will be used as input for the steps. First, the fasta files will be used to generate ancestry panel files. Then, the RIL realigned bam files and the panel files will be used to generate ancestry calls for each RIL. Let's discuss the steps to generate panel first.
 
 ### Ancestry panel files
-test
+test2
