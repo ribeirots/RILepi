@@ -60,7 +60,7 @@ java -Xmx5g -jar ./alignment_software/GenomeAnalysisTK-3.2-2/GenomeAnalysisTK.ja
 #python3 filter_indel_vcf.py ${1}_INDELS_indels.bed ${1}_sites.vcf
 python3 indel_vcf.py ${1}_INDELS.vcf # generates vcf file with all the sites to be filtered out for being indels or near indels (3 bp). The output is used in the bedtools intersect command below
 
-bedtools intersect -v -a ${1}_sites.vcf -b ${1}_INDELS_indelfilter.vcf > ${1}_noindel_sites.vcf  # -v outputs the sites in -a that do not overlap -b. It basically masks the indel regions
+bedtools intersect -v -a ${1}_sites.vcf -b ${1}_INDELS_indelfilter.vcf -header > ${1}_noindel_sites.vcf  # -v outputs the sites in -a that do not overlap -b. It basically masks the indel regions
 
 bgzip ${1}_noindel_sites.vcf
 
