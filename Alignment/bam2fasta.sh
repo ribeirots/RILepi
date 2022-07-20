@@ -107,5 +107,5 @@ mv ${1}_INDEL*.vc* output/
 mv ${1}_SNPs.vc* output/
 mv *.log output/
 mv *.fasta output/
-#rm ${1}_sites.fasta
-#rm ${1}_to_exclude.vcf
+rm ${1}_sites.fasta
+rm ${1}_to_exclude.vcf

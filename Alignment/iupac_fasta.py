@@ -92,7 +92,8 @@ with open(sys.argv[1]+'_Chr'+sys.argv[2]+'.fasta') as fastaf: # open the fasta f
         
         for k in iupac_dict.keys():
             for site in iupac_dict[k]:
-                r[site] = k
+                if r[site] != 'N': # if it is equal to N it is because it was filtered out for whatever reason
+                    r[site] = k
         output = open(sys.argv[1]+'_Chr'+sys.argv[2]+'_diploid.fasta','w')
         output.write(''.join(r)+'\n')
 
