@@ -89,7 +89,7 @@ with open(sys.argv[1]+'_sites.vcf') as sitevcf:
 #checking the fasta file for all the conditions listed in the header
 with open(sys.argv[1]+'_Chr'+sys.argv[2]+'_diploid.fasta') as fastaf: # open the fasta file
     for r in fastaf:
-        r = re.split('',r[:-1])[1:-1]
+        r = [c for c in r[:-1]]
         if len(r) != armsize:
             print('Fasta file length = '+str(len(r))+'. While the chrm arm expected length is: '+str(armsize))
             print('quitting script.')
