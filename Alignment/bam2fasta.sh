@@ -8,6 +8,7 @@
 # It requires Dmel reference fasta
 # It requires indel_vcf.py script (made by me)
 # It requires split_fasta.py script (made by me)
+# It requires iupac_fasta.py script (made by me)
 
 # Check if custom made script exists.
 if [ ! -f indel_vcf.py ]
@@ -20,6 +21,13 @@ fi
 if [ ! -f split_fasta.py ]
 then
 	echo "split_fasta.py script not found in this folder."
+	echo "Terminating script."
+	exit 1
+fi
+
+if [ ! -f iupac_fasta.py ]
+then
+	echo "iupac_fasta.py script not found in this folder."
 	echo "Terminating script."
 	exit 1
 fi
@@ -59,17 +67,36 @@ java -Xmx5g -jar ./alignment_software/GenomeAnalysisTK-3.2-2/GenomeAnalysisTK.ja
 
 python3 indel_vcf.py ${1}_INDELS.vcf # generates vcf file with all the sites to be filtered out for being indels or near indels (3 bp). The output is used in the bedtools intersect command below
 
-bedtools intersect -v -a ${1}_sites.vcf -b ${1}_INDELS_indelfilter.vcf -header > ${1}_noindel_sites.vcf  # -v outputs the sites in -a that do not overlap -b. It basically masks the indel regions
+#bedtools intersect -v -a ${1}_sites.vcf -b ${1}_INDELS_indelfilter.vcf -header > ${1}_noindel_sites.vcf  # -v outputs the sites in -a that do not overlap -b. It basically masks the indel regions
 
-bgzip ${1}_noindel_sites.vcf
+bgzip ${1}_sites.vcf
 
-tabix -p vcf ${1}_noindel_sites.vcf.gz
+tabix -p vcf ${1}_sites.vcf.gz
 
-bcftools filter -i 'QUAL<32 | GT="./."' ${1}_noindel_sites.vcf.gz -o ${1}_to_exclude.vcf # marks the regions to be filtered out (no data and low qual)
+bcftools filter -i 'QUAL<32 | GT="./."' ${1}_sites.vcf.gz -o ${1}_to_exclude.vcf # marks the regions to be filtered out (no data and low qual)
 
-bcftools consensus -I -m ${1}_to_exclude.vcf -f ./alignment_software/dmel_ref/DmelRef.fasta ${1}_noindel_sites.vcf.gz > ${1}_sites.fasta # this fasta file will not be separated by chrm arm, will need further processing. The VCF was filtered from indels. This command should filter out low quality sites (-i should only include QUAL>=32). -I will output IUPAC code from the genotypes. The '-a N', that used to output N when the site is absent, is obsolete now. I will need to check the output to see what was done with the absent sites. Manual for the 1.8 version of bcftools: http://www.htslib.org/doc/1.8/bcftools.html#common_options
+bgzip ${1}_to_exclude.vcf
+bgzip ${1}_INDELS_indelfilter.vcf # output of indel_vcf.py
+
+tabix -p vcf ${1}_to_exclude.vcf
+tabix -p vcf ${1}_INDELS_indelfilter.vcf
+
+bcftools merge --use-header ${1}_to_exclude.vcf.gz -o ${1}_mask.vcf ${1}_to_exclude.vcf.gz ${1}_INDELS_indelfilter.vcf.gz # to be used as mask next
+
+bgzip ${1}_mask.vcf
+tabix -p vcf ${1}_mask.vcf
+
+bcftools consensus -m ${1}_mask.vcf -f ./alignment_software/dmel_ref/DmelRef.fasta ${1}_sites.vcf.gz > ${1}_sites.fasta # this fasta file will not be separated by chrm arm, will need further processing. The VCF was filtered from indels. This command should filter out low quality sites (-i should only include QUAL>=32). -I will output IUPAC code from the genotypes. The '-a N', that used to output N when the site is absent, is obsolete now. I will need to check the output to see what was done with the absent sites. Manual for the 1.8 version of bcftools: http://www.htslib.org/doc/1.8/bcftools.html#common_options
 
 python3 split_fasta.py ${1}_sites.fasta ${1}
+
+gzip -d ${1}_sites.vcf.gz
+
+python3 iupac_fasta.py ${1} X
+python3 iupac_fasta.py ${1} 2L
+python3 iupac_fasta.py ${1} 2R
+python3 iupac_fasta.py ${1} 3L
+python3 iupac_fasta.py ${1} 3R
 
 mv ${1}*_site*.vcf.g* output/
 
@@ -79,5 +106,5 @@ mv ${1}_INDEL*.vc* output/
 mv ${1}_SNPs.vc* output/
 mv *.log output/
 mv *.fasta output/
-rm ${1}_sites.fasta
-rm ${1}_to_exclude.vcf
+#rm ${1}_sites.fasta
+#rm ${1}_to_exclude.vcf
