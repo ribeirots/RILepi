@@ -87,7 +87,7 @@ with open(sys.argv[1]+'_sites.vcf') as sitevcf:
                             iupac_to_test[repl_index] = int(r[1]) - 1
 
 #checking the fasta file for all the conditions listed in the header
-with open(sys.argv[1]+'_Chr'+sys.argv[2]+'.fasta') as fastaf: # open the fasta file
+with open(sys.argv[1]+'_Chr'+sys.argv[2]+'_diploid.fasta') as fastaf: # open the fasta file
     for r in fastaf:
         r = re.split('',r[:-1])[1:-1]
         if len(r) != armsize:
