@@ -78,15 +78,16 @@ bcftools filter -i 'QUAL<32 | GT="./."' ${1}_sites.vcf.gz -o ${1}_to_exclude.vcf
 bgzip ${1}_to_exclude.vcf
 bgzip ${1}_INDELS_indelfilter.vcf # output of indel_vcf.py
 
-tabix -p vcf ${1}_to_exclude.vcf
-tabix -p vcf ${1}_INDELS_indelfilter.vcf
+tabix -p vcf ${1}_to_exclude.vcf.gz
+tabix -p vcf ${1}_INDELS_indelfilter.vcf.gz
 
-bcftools merge --use-header ${1}_to_exclude.vcf.gz -o ${1}_mask.vcf ${1}_to_exclude.vcf.gz ${1}_INDELS_indelfilter.vcf.gz # to be used as mask next
+bcftools concat -a --remove-duplicates ${1}_to_exclude.vcf.gz ${1}_INDELS_indelfilter.vcf.gz -o ${1}_mask.vcf
+#bcftools merge --use-header ${1}_to_exclude.vcf.gz -o ${1}_mask.vcf ${1}_to_exclude.vcf.gz ${1}_INDELS_indelfilter.vcf.gz # to be used as mask next
 
 bgzip ${1}_mask.vcf
-tabix -p vcf ${1}_mask.vcf
+tabix -p vcf ${1}_mask.vcf.gz
 
-bcftools consensus -m ${1}_mask.vcf -f ./alignment_software/dmel_ref/DmelRef.fasta ${1}_sites.vcf.gz > ${1}_sites.fasta # this fasta file will not be separated by chrm arm, will need further processing. The VCF was filtered from indels. This command should filter out low quality sites (-i should only include QUAL>=32). -I will output IUPAC code from the genotypes. The '-a N', that used to output N when the site is absent, is obsolete now. I will need to check the output to see what was done with the absent sites. Manual for the 1.8 version of bcftools: http://www.htslib.org/doc/1.8/bcftools.html#common_options
+bcftools consensus -m ${1}_mask.vcf.gz -f ./alignment_software/dmel_ref/DmelRef.fasta ${1}_sites.vcf.gz > ${1}_sites.fasta # this fasta file will not be separated by chrm arm, will need further processing. The VCF was filtered from indels. This command should filter out low quality sites (-i should only include QUAL>=32). -I will output IUPAC code from the genotypes. The '-a N', that used to output N when the site is absent, is obsolete now. I will need to check the output to see what was done with the absent sites. Manual for the 1.8 version of bcftools: http://www.htslib.org/doc/1.8/bcftools.html#common_options
 
 python3 split_fasta.py ${1}_sites.fasta ${1}
 
