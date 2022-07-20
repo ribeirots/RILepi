@@ -93,6 +93,6 @@ with open(sys.argv[1]+'_Chr'+sys.argv[2]+'.fasta') as fastaf: # open the fasta f
         for k in iupac_dict.keys():
             for site in iupac_dict[k]:
                 r[site] = k
-        output = open('tmp_Chr2L.fasta','w')
+        output = open(sys.argv[1]+'_Chr'+sys.argv[2]+'_diploid.fasta','w')
         output.write(''.join(r)+'\n')
 

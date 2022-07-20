@@ -45,7 +45,7 @@ with open(sys.argv[1]+'_INDELS.vcf') as indels:
 
 if indels_to_test[9] > 5:
     indels_to_test[9] = indels_to_test[9] - 2 # I just picked one random large position to reduce by 2 to test if sites downstream of the indel were masked as well.
-print('indels obtained')
+
 # finding other sites to check (missing data, ht iupac code, lowQ filter, alternate allele (A, in this code))
 missing_to_test = []
 lowq_to_test = []
@@ -85,7 +85,7 @@ with open(sys.argv[1]+'_sites.vcf') as sitevcf:
                         if random.randrange(0,1000) < 1:
                             repl_index = random.randrange(0,10)
                             iupac_to_test[repl_index] = int(r[1]) - 1
-print('check sites obtained')
+
 #checking the fasta file for all the conditions listed in the header
 with open(sys.argv[1]+'_Chr'+sys.argv[2]+'.fasta') as fastaf: # open the fasta file
     for r in fastaf:
