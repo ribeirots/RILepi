@@ -1,3 +1,4 @@
+#!/bin/bash
 # pipeline to obtain panel files for both RIL sets
 # tribeiro@wisc.edu
 
@@ -34,9 +35,6 @@ do
 		mv ${l}_Chr${c}_diploid.fasta ${l}_Chr${c}.fas
 	done
 done
-
-mkdir FR_panel
-mkdir EF_panel
 
 # Generate panel files.
 for c in X 2L 2R 3L 3R
