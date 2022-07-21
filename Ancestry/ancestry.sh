@@ -141,3 +141,8 @@ do
 	rm *.ahmm_in.panel
 	rm ahmm_in.samples
 done
+
+#### Following this, place file RIL_genotypes_windows.pl in the posteriors folder. Ensure the script is updated at the "@ my RILS"
+#### line to include the lines you are using (and are the names of the posterior files. "my @chrs" should be: "X", "2L", "2R", "3L" and "3R",
+#### the name of the sub-directories containing ahmm posteriors. Place window files into the posterior folder and run the perl script
+#### to generate ancestry calls for each line in a single csv file.
