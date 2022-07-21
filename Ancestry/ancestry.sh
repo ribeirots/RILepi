@@ -129,7 +129,7 @@ do
 		../Ancestry_HMM/src/ancestry_hmm -i ${name}.ahmm_in.panel -s ahmm_in.samples -a 2 0.5 0.5 -p 0 10000 0.5 -p 1 1 0.5
 		### Move files into a folder "posteriors" and sub-directories (ex. "2L"). The posteriors must have the naming scheme "<line>.posterior
 		### and be in a subdirectory with names X, 2L, 2R, 3L, and 3R for the script used in the next steps.
-		mv ${RIL}_realign.bam.posterior posteriors/${RIL}.${name}.posterior 
+		mv ${RIL}_realign.bam.posterior posteriors/${name}/${RIL}.posterior 
 	done
 	
 	### Remove unecessary intermediate files

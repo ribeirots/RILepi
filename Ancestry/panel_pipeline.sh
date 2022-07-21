@@ -39,6 +39,6 @@ done
 # Generate panel files.
 for c in X 2L 2R 3L 3R
 do
-	perl find_snps.pl FR320N_Chr${c}.fas ZI418N_Chr${c}.fas > RIL_FR/${c}.panel
-	perl find_snps.pl EF43N_Chr${c}.fas ZI251N_Chr${c}.fas > RIL_EF/${c}.panel
+	perl find_snps.pl FR320N_Chr${c}.fas ZI418N_Chr${c}.fas ${c} > RIL_FR/${c}.panel
+	perl find_snps.pl EF43N_Chr${c}.fas ZI251N_Chr${c}.fas ${c} > RIL_EF/${c}.panel
 done
