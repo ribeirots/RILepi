@@ -37,6 +37,10 @@ do
 done
 
 # Generate panel files.
+
+### IMPORTANT: ORDER OF GENOME ON COMMAND LINE MATTERS FOR ANCESTRY CALL ASSIGNMENT. 
+### The first genome listed when calling the script will ultimately represent ancestry type “0”, and the second ancestry type “2”.
+### Here, France ancestry and Ethiopia ancestry will be the genotype “0” and Zambia will be “2”
 for c in X 2L 2R 3L 3R
 do
 	perl find_snps.pl FR320N_Chr${c}.fas ZI418N_Chr${c}.fas ${c} > RIL_FR/${c}.panel
