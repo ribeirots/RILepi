@@ -4,12 +4,11 @@ This is a collaborative project involving genotyping and phenotyping of two sets
 
 The genomes for each RIL and the parental strains were obtained with Next Gen sequencing using Illumina platform.
 
-## Short read processing
-*Scripts for this section are located in the Alignment directory.*
+## DNA Alignment
+*Scripts for this section are located in the _Alignment_ directory.*
 
 This section contains the steps taken to analyse the genomic data, starting with the fastq files output from the Illumina sequecing.
 
-### DNA Alignment
 We used the UW-Madison Center for High Throughput Computing (CHTC) to perform the DNA alignment of our samples. Using CHTC allowed us to greatly parallelize the alignment step. It required that our initial fastq files be split in shorter files and each of these shorter fastq files were submitted as independent jobs to be aligned - and then latter merged back together. The *fastq_processing1.sh* handles the splitting step for each sample and generates a file listing all the shorter fastq blocks which will be used for the parallel submission. After running this script locally, in the same folder with the fastq files to be split, the block files and the newly generated *Seq_list_single.txt* file need to be uploaded to CHTC.
 
 On CHTC, after the files are placed in their appropriate directories, we submitted the jobs with the *align_pt1.sub* script. This script uses as executable file the *align_pt1.sh* script. The *align_pt1.sh* script will perform the DNA alignment using bwa mem. The complete pipeline used in each parallel job also included steps using *samtools* to process the bam files. It uses *collate* to organize the reads, *fixmate* to correct any flaws in read-pairing, *sort* to sort the reads and finally *markdup* with *-r* flag to identify and remove duplicate reads. In the end, we have bam files sorted and without duplicates for each fastq block. The block files need to be download to continue the pipeline locally.
@@ -20,11 +19,16 @@ To generate the fasta files from the vcf files I am having to create a new pipel
 
 The RILs realign bamfiles and the fasta files will be used as input for the steps. First, the fasta files will be used to generate ancestry panel files. Then, the RIL realigned bam files and the panel files will be used to generate ancestry calls for each RIL. Let's discuss the steps to generate panel first.
 
-### Ancestry calls
-Scripts for this section can be found in the _Ancestry_ folder.
+## Ancestry calls
+*Scripts for this section can be found in the _Ancestry_ directory.*
 
 Panel files were obtained with the script _panel\_pipeline.sh_. This script uses the perl script _find\_snps.pl_ to generate one panel file per chromosome arm for each RIL data set. Order of the genomes matter and herein EF and FR were used first and will have genotype 0. The panel files are stored in their RIL's respective folders along the bam files for all the RILs (already without duplicates and realigned around indels). Then, we call the script _ancestry.sh_ to use the panels and bam files to call AncestryHMM and obtain posterior ancestry probabilities for each RIL. The _ancestry.sh_ script loops through each RIL and each chromosome arm to obtain ril-arm-specific mpileup files (obtained with _samtools mpileup_) and the ril-arm-specific panel files (obtained with the _populate\_snp\_matrix.pl_ script). To adjust the distance between the SNPs accordingly to the RIL experimental design we used _recomb.csv_ files generated for each RIL set and chromosome arm based on how many generations of recombination they had and on the recombination rates for _Dmel_ from Comeron et al. 2012. The distance adjustment is made with the _rec\_map.py_ script. With the panel files per RIL per arm we call _ancestry\_hmm_ to obtain the posterior probabilities.
 
 Following this, we used the script _RIL\_genotypes\_windows.pl_, placed in the _posteriors_ folder, to call ancestries for windows and not per SNP. The files delimiting the window sizes need to be located in the _posterior_ folders as well. Here, we used _windows\_ZI1k\_Chr*.txt_, which has windows defined to contain 1k SNPs in the ZI population. We have to manually update the genotypes perl script to ensure the script has the correct RILs at the _"@ my RILS"_ variable, we also need to manually input the output file name.
 
 We obtained the ancestry calls in the files: _*\_RIL\_genotypes\_winZI1k.txt_ and did a quick inputation to fill the gaps of at most 10 windows of missing data with the surrounding genotype if the surrounding genotypes were the same for each line. The files with inputation are called _*\_RIL\_genotypes\_winZI1k\_gap10.txt_. In total, EF had 3892 window positions with missing data (out of 6445 total, so 60.39%) before inputation, and FR had 1815 windows with missing data (28.16%). After inputation, EF had 1263 windows with missing data (19.60%) and FR had 274 (4.25%). After inputation, of the EF lines, 3 of them had more than 5% missing data (E191R with 7.65%, E107R with 6.24%, and E122R with 5.93%). The FR line with the largest amount of missing data was F401R (1.36%). - Inputation was done with the _missing\_genotypes.py_ script and missing data count was done with the _count\_ril\_missingdata.py_ script.
+
+## G x P input files
+*Scripts for this section can be found in the _GenoPheno_ directory.*
+
+We combined the ancestry genotypes per window obtained above with phenotypic data to generate files that will be analized in our mapping and epistasis analyses. Currently, our focus is on using the r/qtl R package (source). We usa a set of files and scripts to generate the input files, as described below.
