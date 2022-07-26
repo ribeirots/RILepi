@@ -35,3 +35,4 @@ We combined the ancestry genotypes per window obtained above with phenotypic dat
 
 ## R/qtl
 *Scripts for this section can be found in the _rqtl_ directory.*
+I am uploading more information about this step in the readme of the rqtl folder.
