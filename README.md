@@ -32,3 +32,6 @@ We obtained the ancestry calls in the files: _*\_RIL\_genotypes\_winZI1k.txt_ an
 *Scripts for this section can be found in the _GenoPheno_ directory.*
 
 We combined the ancestry genotypes per window obtained above with phenotypic data to generate files that will be analized in our mapping and epistasis analyses. Currently, our focus is on using the r/qtl R package (source). We usa a set of files and scripts to generate the input files, as described below.
+
+## R/qtl
+*Scripts for this section can be found in the _rqtl_ directory.*

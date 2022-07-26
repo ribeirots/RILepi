@@ -1,0 +1,41 @@
+---
+title: "R/qtl: FR EtOH"
+author: "Tiago da Silva Ribeiro"
+date: '2022-07-26'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# French RILs - Ethanol tolerance mapping and epistasis test
+
+This document contains the R/qtl code to analyze RIL data with the goal of finding QTLs and performing epistasis tests. Here, we are using FRxZI RILs and the phenotype analyzed is Ethanol Tolerance.
+
+```{r etohload, echo=FALSE, warning=FALSE}
+library(qtl)
+library(ggplot2)
+#setwd("Documents/git_repos/ril_epistasis/RILepi/rqtl/")
+etoh = read.cross("csv", , "FR_etoh_rqtl.csv", sep=",", alleles=c("Z","F"), 
+                  genotypes = c("FF","FZ","ZZ"))
+```
+
+#### Phenotype summary:
+```{r etoh pheno sum, echo=FALSE, warning=FALSE, fig.height = 3, fig.width = 3, fig.align = "default"}
+summary(etoh$pheno$etoh)
+etohdf <- data.frame(etoh$pheno)
+ggplot(etohdf, aes(x=RIL,y=etoh)) + geom_point() + theme_classic() + 
+    theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+
+ggplot(etohdf, aes(x=etoh, y=..density..)) + geom_histogram(bins=20, colour="black", fill="light gray") + theme_classic() +
+  geom_density(alpha=.2, fill="red") 
+```
+
+#### Genotype summary:
+I am not doing the segregation distortion test, which has the default expectation of genotypes distributed following 1:2:1 fashion. The RILs would most likely have a 1:0:1 expectation, but we know that the heterozygous are not actually 0. That said, at a quick glance it seems like we have a biased towards having more FF than ZZ in the genome, so I will investigate that.
+```{r geno expl, echo=FALSE, warning=TRUE, fig.height = 3, fig.width = 3, fig.align = "default"}
+gt = geno.table(etoh)
+gt[ gt$P.value < 1e-7, ]
+```
