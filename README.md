@@ -26,13 +26,15 @@ Panel files were obtained with the script _panel\_pipeline.sh_. This script uses
 
 Following this, we used the script _RIL\_genotypes\_windows.pl_, placed in the _posteriors_ folder, to call ancestries for windows and not per SNP. The files delimiting the window sizes need to be located in the _posterior_ folders as well. Here, we used _windows\_ZI1k\_Chr*.txt_, which has windows defined to contain 1k SNPs in the ZI population. We have to manually update the genotypes perl script to ensure the script has the correct RILs at the _"@ my RILS"_ variable, we also need to manually input the output file name.
 
-We obtained the ancestry calls in the files: _*\_RIL\_genotypes\_winZI1k.txt_ and did a quick inputation to fill the gaps of at most 10 windows of missing data with the surrounding genotype if the surrounding genotypes were the same for each line. The files with inputation are called _*\_RIL\_genotypes\_winZI1k\_gap10.txt_. In total, EF had 3892 window positions with missing data (out of 6445 total, so 60.39%) before inputation, and FR had 1815 windows with missing data (28.16%). After inputation, EF had 1263 windows with missing data (19.60%) and FR had 274 (4.25%). After inputation, of the EF lines, 3 of them had more than 5% missing data (E191R with 7.65%, E107R with 6.24%, and E122R with 5.93%). The FR line with the largest amount of missing data was F401R (1.36%). - Inputation was done with the _missing\_genotypes.py_ script and missing data count was done with the _count\_ril\_missingdata.py_ script.
+We obtained the ancestry calls in the files: _*\_RIL\_genotypes\_winZI1k.txt_ and did a quick imputation to fill the gaps of at most 10 windows of missing data with the surrounding genotype if the surrounding genotypes were the same for each line. The files with imputation are called _*\_RIL\_genotypes\_winZI1k\_gap10.txt_. In total, EF had 3892 window positions with missing data (out of 6445 total, so 60.39%) before imputation, and FR had 1815 windows with missing data (28.16%). After imputation, EF had 1263 windows with missing data (19.60%) and FR had 274 (4.25%). After imputation, of the EF lines, 3 of them had more than 5% missing data (E191R with 7.65%, E107R with 6.24%, and E122R with 5.93%). The FR line with the largest amount of missing data was F401R (1.36%). - Imputation was done with the _missing\_genotypes.py_ script and missing data count was done with the _count\_ril\_missingdata.py_ script.
 
 ## G x P input files
 *Scripts for this section can be found in the _GenoPheno_ directory.*
 
-We combined the ancestry genotypes per window obtained above with phenotypic data to generate files that will be analized in our mapping and epistasis analyses. Currently, our focus is on using the r/qtl R package (source). We usa a set of files and scripts to generate the input files, as described below.
+We combined the ancestry genotypes per window obtained above with phenotypic data to generate files that will be analyzed in our mapping and epistasis analyses. Currently, our focus is on using the r/qtl R package (source). We used a set of files and scripts to generate the input files, as described below.
+
+We used _input\_rqtl\_nopheno.py_ to transform the data into the input format for rqtl, then used _input\_rqtl\_addpheno.py_ to add the desired phenotype and _comeron\_rqtl.py_ to add recombination data to the file.
 
 ## R/qtl
 *Scripts for this section can be found in the _rqtl_ directory.*
-I am uploading more information about this step in the readme of the rqtl folder.
+We used _window\_merge\_genotype.py_ to reduce the input file combining windows there were next to each other and had the same genotype for ALL the lines used, since the tests would be identical.

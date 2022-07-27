@@ -1,0 +1,83 @@
+---
+title: "R/qtl: FR EtOH"
+author: "Tiago da Silva Ribeiro"
+date: '2022-07-26'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# French RILs - Ethanol tolerance mapping and epistasis test
+
+This document contains the R/qtl code to analyze RIL data with the goal of finding QTLs and performing epistasis tests. Here, we are using FRxZI RILs and the phenotype analyzed is Ethanol Tolerance.
+
+```{r etohload, echo=FALSE, warning=FALSE}
+library(qtl)
+library(ggplot2)
+#setwd("Documents/git_repos/ril_epistasis/RILepi/rqtl/")
+etoh = read.cross("csv", , "FR_etoh_rqtl.csv", sep=",", alleles=c("Z","F"), 
+                  genotypes = c("FF","FZ","ZZ"))
+```
+
+#### Phenotype summary:
+```{r etoh pheno sum, echo=FALSE, warning=FALSE, fig.height = 3, fig.width = 3, fig.align = "default"}
+summary(etoh$pheno$etoh)
+etohdf <- data.frame(etoh$pheno)
+ggplot(etohdf, aes(x=RIL,y=etoh)) + geom_point() + theme_classic() + 
+    theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+
+ggplot(etohdf, aes(x=etoh, y=..density..)) + geom_histogram(bins=20, colour="black", fill="light gray") + theme_classic() +
+  geom_density(alpha=.2, fill="red") 
+```
+
+#### Genotype summary:
+I am not doing the segregation distortion test, which has the default expectation of genotypes distributed following 1:2:1 fashion. The RILs would most likely have a 1:0:1 expectation, but we know that the heterozygous are not actually 0. That said, at a quick glance it seems like we have a biased towards having more FF than ZZ in the genome, so I will investigate that.
+```{r geno expl, echo=FALSE, warning=TRUE, fig.height = 3, fig.width = 3, fig.align = "default"}
+gt = geno.table(etoh)
+#gt[ gt$P.value < 1e-7, ]
+```
+
+#### scanone
+```{r geno scan1, echo=FALSE, warning=TRUE, fig.height = 5, fig.width = 5, fig.align = "default"}
+etoh_genoprob <- calc.genoprob(etoh,step=0)
+# Scanone
+etoh.mr <- scanone(etoh_genoprob, method="mr", pheno.col = 2) # 2 = etoh
+write.table(etoh.mr,file="etoh_mr_scanone.csv",row.names = T,sep=",")
+summary(etoh.mr)
+plot(etoh.mr)
+```
+#### Permutations
+```{r perm, results='hide', echo=FALSE}
+etoh.mr.perm <- scanone(etoh_genoprob, method="mr", pheno.col = 2, n.perm=10)
+```
+
+```{r geno scan1perm, echo=FALSE, warning=TRUE, fig.height = 5, fig.width = 5, fig.align = "default"}
+plot(etoh.mr.perm)
+summary(etoh.mr.perm, alpha=c(0.01, 0.05))
+max(etoh.mr.perm)
+plot(etoh.mr)
+abline(h = summary(etoh.mr.perm, alpha=c(0.01, 0.05))[1]) # 1% lod
+abline(h = summary(etoh.mr.perm, alpha=c(0.01, 0.05))[2]) # 5% lod
+summary(etoh.mr, perms=etoh.mr.perm, alpha=0.01)
+# Interval
+# LOD
+#lodint(etoh.mr, 5, 1.8, expandtomarkers=TRUE)
+# Bayers
+#bayesint(etoh.mr, 1, 0.95, expandtomarkers=TRUE)
+```
+
+```{r geno scan1 more plots, echo=FALSE, warning=TRUE, fig.height = 4, fig.width = 4, fig.align = "default"}
+# Effect Plots (to more properly calculate effect sizes wait until Chap 9, Multiple QTL, function fitqtl)
+effectplot(etoh_genoprob, mname1="3R_18207360_18233524", pheno.col=2)
+plotPXG(etoh_genoprob, marker="3R_18207360_18233524", pheno.col=2) # red dots = missing data (none here)
+```
+
+#### SCANTWO
+```{r geno scan2, echo=FALSE, warning=TRUE, fig.height = 4, fig.width = 4, fig.align = "default"}
+#etoh_genoprob2 <- calc.genoprob(etoh,step=0, err=0.001, )
+#etoh_s2 <- scantwo(etoh_genoprob2, verbose = FALSE)
+```
