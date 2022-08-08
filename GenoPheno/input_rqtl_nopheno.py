@@ -16,15 +16,15 @@ for x in zip(*genotype):
 chrom = ['']
 for x in z[0]:
     if x == 'X':
-        chrom.append('3') # 3 = X
+        chrom.append('1') # 1 = X
     elif x == '2L':
-        chrom.append('4') # 4 = 2L
+        chrom.append('2') # 2 = 2L
     elif x == '2R':
-        chrom.append('4') # 4 = 2R
+        chrom.append('2') # 3 = 2R
     elif x == '3L':
-        chrom.append('5') # 5 = 3L
+        chrom.append('3') # 4 = 3L
     elif x == '3R':
-        chrom.append('5') # 5 = 3R
+        chrom.append('3') # 5 = 3R
 #print(chrom[0:10])
 
 labels = ['RIL']

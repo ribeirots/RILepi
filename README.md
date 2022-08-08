@@ -33,7 +33,7 @@ We obtained the ancestry calls in the files: _*\_RIL\_genotypes\_winZI1k.txt_ an
 
 We combined the ancestry genotypes per window obtained above with phenotypic data to generate files that will be analyzed in our mapping and epistasis analyses. Currently, our focus is on using the r/qtl R package (source). We used a set of files and scripts to generate the input files, as described below.
 
-We used _input\_rqtl\_nopheno.py_ to transform the data into the input format for rqtl, then used _input\_rqtl\_addpheno.py_ to add the desired phenotype and _comeron\_rqtl.py_ to add recombination data to the file.
+We used _input\_rqtl\_nopheno.py_ to transform the data into the input format for rqtl, then used _input\_rqtl\_addpheno.py_ to add the desired phenotype. We used the script _missing\_genotypes.py_ to attempt to imputate some of the missing windows (if they were surrounded by the same genotype and there were no more than 10 contiguous missing windows). We used the script _window\_merge\_genotype.py_ to merge neighboring windows if the genotype for these windows were the same for all the RILs. Lastly, we used the script _comeron\_rqtl.py_ to add recombination data to the file, basically adding the cM position for the midpoint of each window.
 
 ## R/qtl
 *Scripts for this section can be found in the _rqtl_ directory.*

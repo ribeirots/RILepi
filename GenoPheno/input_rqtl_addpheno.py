@@ -29,13 +29,13 @@ new_row1 = [geno[0][0]] + [sys.argv[3]] + geno[0][1:] # header
 
 # Chrm. cM
 new_row2 = [geno[1][0]] + [''] + geno[1][1:] # chrm
-new_row3 = [geno[2][0]] + [''] + geno[2][1:] # distance
+#new_row3 = [geno[2][0]] + [''] + geno[2][1:] # distance
 
 
 print(len(new_row1))
 output.write(','.join(new_row1)+'\n')
 output.write(','.join(new_row2)+'\n')
-output.write(','.join(new_row3)+'\n')
+#output.write(','.join(new_row3)+'\n')
 
 for g in geno:
     new_row = []
