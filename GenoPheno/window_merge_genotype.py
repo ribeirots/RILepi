@@ -38,7 +38,7 @@ win_end = chr_genotype[0][2]
 merged = []
 pos_check = 0
 for i in range(0,len(chr_genotype)-1):
-    if chr_genotype[i][3:] == chr_genotype[i+1][3:]:
+    if chr_genotype[i][3:] == chr_genotype[i+1][3:] and chr_genotype[i][0] == chr_genotype[i+1][0]:
         win_end = chr_genotype[i+1][2]
     else:
         merged_windows = [chr_genotype[i][0], win_start, win_end] + chr_genotype[i][3:]
@@ -46,7 +46,7 @@ for i in range(0,len(chr_genotype)-1):
         win_start = chr_genotype[i+1][1]
         win_end = chr_genotype[i+1][2]
 
-if chr_genotype[-2][3:] == chr_genotype[-1][3:]:
+if chr_genotype[-2][3:] == chr_genotype[-1][3:] and chr_genotype[-2][0] == chr_genotype[-1][0]:
     merged_windows = [chr_genotype[-1][0], win_start, win_end] + chr_genotype[-1][3:]
     merged.append(merged_windows)
 
@@ -54,11 +54,15 @@ print(len(chr_genotype))
 print(len(merged))
 
 
-output = []
+merged_noNA = []
+for column in merged:
+    if np.count_nonzero(column == 'NA') <= 10:
+        merged_noNA.append(column)
 
+output = []
 for row in header:
     output.append(row)
-for row in merged:
+for row in merged_noNA:
     n_row = ['_'.join(row[:3])] + row[3:]
     row = n_row
     output.append(row)
