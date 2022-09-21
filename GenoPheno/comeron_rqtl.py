@@ -3,8 +3,9 @@
 # tribeiro@wisc.edu
 
 import re, sys
-comeron_file = 'recomb_Comeron_2012_for_rils.csv'
+comeron_file = 'recomb_Comeron_2012_FR_EF_cM_perbase.csv'
 
+print('Check EF or FR setting for comvalue on row 17 !!!')
 
 # read comeron file and create a dictionary with Chr_Start_End as key, cM_F12 and perbase_increment as values
 comeron = {}
@@ -13,21 +14,21 @@ with open(comeron_file) as com:
     for r in com:
         r = re.split(',',r[:-1])
         comkey = r[0]+'_'+str(int(r[1]) - 1)+'_'+str(int(r[2])-1) # key example: ChrX_0_99999, I made it 0-based 
-        comvalue = [float(r[7]), float(r[8])] # value example: [0, 1.1E-09]
+        comvalue = [float(r[3]), float(r[4])] # Use indexes [3] and [4] for France and [5] and [6] for Ethiopia RILs. V:alue example: [0, 1.1E-09] # cM_position and per_basepair_rec
         comeron[comkey] = comvalue
 
 # function to find the cM position of the midpoint of a window
 def cM_midpoint(chrm, start, end): # Rqtl input is zero-based, comeron was not but I modified it when creating the dict above.
 
     # find start position
-    key_start = start // 100000 * 100000  # comeron dict is not 0 based, start at 1, 100001, 200001, etc.
+    key_start = start // 100000 * 100000  
     key_end = key_start  + 99999 # final position of the comeron window
     rqtl_key = 'Chr'+chrm + '_' + str(key_start) + '_' + str(key_end)
     bp_dist = start - key_start # distance from the start of the comeron window
     start_pos_cM = comeron[rqtl_key][0] + comeron[rqtl_key][1] * bp_dist
 
     # find end position
-    key_start = end // 100000 * 100000  # comeron dict is not 0 based, start at 1, 100001, 200001, etc.
+    key_start = end // 100000 * 100000  
     key_end = key_start  + 99999 # final position of the comeron window
     rqtl_key = 'Chr'+chrm + '_' + str(key_start) + '_' + str(key_end)
     bp_dist = end - key_start # distance from the start of the comeron window
@@ -54,13 +55,15 @@ for i in range(2,len(markers)):
 cM_output = ['','']
 order_check = []
 lastChrm = 'X'
+
 for marker in markers[2:]:
     midcM = cM_midpoint(marker[0], marker[1], marker[2])
     cM_output.append(str(midcM))
 
     # this loop is present to check if the midpoint positions for all the windows in the same chrm are properly ordered
     if marker[0][0] != lastChrm:
-        lastChrm = marker[0][0] # indexing the marker[0] to only get the [0] to focus on chrm 2L and 2R as a single chrm.
+        print(lastChrm)
+        lastChrm = marker[0][0] # indexing the marker[0] to only get the [0][0] to focus on chrm 2L and 2R as a single chrm. And [0][:2] to treat them as separate entities.
         print(lastChrm)
         for i in range(0,len(order_check)-1):
             if order_check[i] > order_check[i+1]:
@@ -68,6 +71,16 @@ for marker in markers[2:]:
                 quit()
         order_check = []
     order_check.append(midcM)
+
+
+# check order for chrm 3
+print(lastChrm)
+for i in range(0,len(order_check)-1):
+    if order_check[i] > order_check[i+1]:
+        print('Order check Error.')
+        quit()
+order_check = []
+
 
 cM_output = ','.join(cM_output)+'\n'
 

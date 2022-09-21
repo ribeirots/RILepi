@@ -20,9 +20,9 @@ for x in z[0]:
     elif x == '2L':
         chrom.append('2') # 2 = 2L
     elif x == '2R':
-        chrom.append('3') # 3 = 2R
+        chrom.append('2') # 2 = 2R
     elif x == '3L':
-        chrom.append('4') # 4 = 3L
+        chrom.append('5') # 5 = 3L
     elif x == '3R':
         chrom.append('5') # 5 = 3R
 #print(chrom[0:10])
