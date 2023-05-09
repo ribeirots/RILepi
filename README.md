@@ -35,11 +35,13 @@ We used _input\_rqtl\_nopheno.py_ to transform the data into the input format fo
 
 The format of the phenotype data we use includes a header in the first row and the RILs and phenotypes in the remaning rows. There are two columns, separated by comma (,). The first column has the RIL ID number (without any letters) and the second column has the phenotype for that RIL. Example:
 
+```
 RIL,pheno
 3,0.9
 5,0.32
 11,0.3697
 15,954 
+```
 
 ## Genome Scan - One Window at a time (scanone)
 *Scripts for this section can be found in the _rqtl_ directory.*
