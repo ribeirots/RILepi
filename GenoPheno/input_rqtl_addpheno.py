@@ -4,7 +4,7 @@
 
 # Arg1: input geno
 # Arg2: input pheno
-# Arg3: pheno-name: one word
+# Arg3: pheno-name: one word, this word will be included in the output file and doesn't need to match any word in the input. Do not use any spaces.
 # Arg4: output
 import re, sys 
 print('rqtl input - add pheno')
@@ -16,6 +16,7 @@ with open(sys.argv[1]) as g:
 
 pheno = []
 with open(sys.argv[2]) as p:
+    next(p)
     for r in p:
         r = re.split(',',r[:-1])
 #        r[0] = r[0][1:-1] # remove the "F_R" from the ril name
@@ -37,11 +38,13 @@ output.write(','.join(new_row1)+'\n')
 output.write(','.join(new_row2)+'\n')
 #output.write(','.join(new_row3)+'\n')
 
-for g in geno:
+for g in geno[2:]:
     new_row = []
     ril_check = 0
     for p in pheno:
-        if g[0][1:-1] == p[0]: # RIL on g has F_R but on p it is just the number. This will likely need to be modified file by file.
+        if str(g[0][1:-1]) == str(p[0]): # RIL on g has F_R but on p it is just the number. This will likely need to be modified file by file.
+            if ril_check == 1:
+                print("Phenotype duplicated for RIL: "+str(p)+".\n")
             ril_check = 1
             new_row = [g[0]] + [p[1]] + g[1:]
             output.write(','.join(new_row)+'\n')
