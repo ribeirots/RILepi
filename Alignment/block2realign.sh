@@ -11,7 +11,7 @@ align_pack=/raid10/Tiago/PigmCages/scripts/alignment_software # path to Picard a
 
 
 # Merge the block files, assumes that they end in "indexed.bam" as per the previous pipeline step
-samtools merge ${1} *indexed.bam
+samtools merge ${id}.bam *indexed.bam
 
 # rmdup
 samtools collate -o ${id}_bam_collate.bam ${id}.bam
