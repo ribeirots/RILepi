@@ -9,7 +9,7 @@ output = outputs/$(line)_align.out
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 
-transfer_input_files = /home/tribeiro/ril_mapping/bwa.tar.gz, /home/tribeiro/ril_mapping/samtools_1.12.tar.gz, /home/tribeiro/ril_mapping/DmelRef.fasta.tar.gz, /home/tribeiro/ril_mapping/Seq/$(line)_R1.fastq.gz, /home/tribeiro/ril_mapping/Seq/$(line)_R2.fastq.gz
+transfer_input_files = /home/tribeiro/ril_mapping/bwa-0.7.17.tar.gz, /home/tribeiro/ril_mapping/DmelRef.fasta.tar.gz, Seq/$(line)_R1.fastq.gz, Seq/$(line)_R2.fastq.gz
 
 requirements =  (OpSysMajorVer == 7)
 
