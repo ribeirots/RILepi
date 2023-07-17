@@ -1,0 +1,6 @@
+# Run one at a time, because the output is just "X.panel, 2L.panel, ..." and do not distinguish the lines used
+
+python3 vcf2panel.py -pl EF43N/EF43N_sites.vcf -ph ZI251N_sites.vcf -pli EF43N_INDELS.vcf -phi ZI251N_INDELS.vcf
+
+#python3 vcf2panel.py -pl FR320N_sites.vcf -ph ZI418N_sites.vcf -pli FR320N_INDELS.vcf -phi ZI418N_INDELS.vcf
+
