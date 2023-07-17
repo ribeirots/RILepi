@@ -10,13 +10,13 @@
 import re, sys, math
 
 # First, make a dictionary for the chrm arm being analyzed
-# here, if recombination rate in a window is 0, it is replaced with 1.0E-09 to ensure that two sites are not located "on top of each other".
+# here, if recombination rate in a window is 0, it is replaced with 5.0E-010 to ensure that two sites are not located "on top of each other".
 recmap_dict = {}
 with open(sys.argv[1]) as reccomeron:
     for r in reccomeron:
         r = re.split('\t',r[:-1])
         if r[3] == '0':
-            r[3] = '1.0E-010'
+            r[3] = '5.0E-010' # Change to E-010 for RILs. Change to E-011 for F2s.
         recmap_dict[r[2]] = r[3]
 
 # this function will receive 2 positions and a recombination map and 
