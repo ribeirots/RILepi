@@ -28,4 +28,4 @@ sed -i 's/_R1.fastq.gz//' Seq_list_single.txt
 
 # next, upload the Seq_list_single.txt and the block gz files to CHTC. 
 # The Seq_list_single.txt file should be on the directory for the mapping.
-# The block files should be in a directory could "Seq" within the mapping directory.
+# The block files should be in a directory called "Seq" within the mapping directory.
