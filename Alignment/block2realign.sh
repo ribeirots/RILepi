@@ -1,11 +1,10 @@
 #!/bin/bash
-# 1: merged_bam file1 name (with .bam)
-# 2: pool1 ID (without _suffix.bam)
-# command example: bash ./block2realign.sh mergedfile.bam poolID
+# 1: bamfile (everything except ".bam")
+# command example: bash ./block2realign.sh bampool
 
 echo 'requires java8 (on marula: conda activate tiagojav8)'
 
-id=$2
+id=$1
 
 dmel_ref=/raid10/Tiago/PigmCages/scripts/alignment_software/dmel_ref/DmelRef.fasta # Drosophila melanogaster reference genome
 align_pack=/raid10/Tiago/PigmCages/scripts/alignment_software # path to Picard and GATK, note that that GATK version used here required java 8. 
@@ -15,12 +14,11 @@ align_pack=/raid10/Tiago/PigmCages/scripts/alignment_software # path to Picard a
 samtools merge ${1} *indexed.bam
 
 # rmdup
-samtools collate -o ${id}_bam_collate.bam ${1}
+samtools collate -o ${id}_bam_collate.bam ${id}.bam
 samtools fixmate -m ${id}_bam_collate.bam ${id}_bam_fixmate.bam
 samtools sort -o ${id}_bam_position.bam ${id}_bam_fixmate.bam
-samtools markdup -r -d 2500 --threads 20 -f stats.txt ${id}_bam_position.bam ${id}_rmdup.bam --threads 25
+samtools markdup -r -d 2500 --threads 20 -f stats.txt ${id}_bam_position.bam ${id}_rmdup.bam
 
-#rm ${1}
 rm ${id}_bam_collate.bam
 rm ${id}_bam_position.bam
 rm ${id}_bam_fixmate.bam
