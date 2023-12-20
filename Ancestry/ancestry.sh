@@ -134,7 +134,7 @@ do
 	for name in $chroms
 	do
 		#### email Matt if there are any questions about ancestry_hmm parameters (ploidy 2 for all here)
-		../Ancestry_HMM/src/ancestry_hmm -i ${name}.ahmm_in.panel -s ahmm_in.samples -a 2 0.31 0.69 -p 0 10000 0.5 -p 1 1 0.5 #-a(ancestry) 0.31 0.69 (31% EF and 69% ZI)
+		../Ancestry_HMM/src/ancestry_hmm -i ${name}.ahmm_in.panel -s ahmm_in.samples -a 2 0.5 0.5 -p 0 10000 0.5 -p 1 1 0.5 #-a(ancestry) 0.31 0.69 (31% EF and 69% ZI)
 		### Move files into a folder "posteriors" and sub-directories (ex. "2L"). The posteriors must have the naming scheme "<line>.posterior
 		### and be in a subdirectory with names X, 2L, 2R, 3L, and 3R for the script used in the next steps.
 		mv ${RIL}_realign.bam.posterior posteriors/${name}/${RIL}.posterior 
